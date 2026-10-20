@@ -14,7 +14,7 @@ st.title("✂️ Barbearia Estilo & Corte")
 st.subheader("Tabela de Serviços e Agendamento Online")
 
 # --- SENHA DE ACESSO DO BARBEIRO ---
-SENHA_BARBEIRO = "1234"  # 👈 Altere para a senha que desejar!
+SENHA_BARBEIRO = "1234"  # 👈 Mude para a senha que desejar!
 
 # --- ESTADO DA SESSÃO (Memória do App) ---
 
@@ -32,7 +32,7 @@ if "agendamentos" not in st.session_state:
         columns=["Cliente", "Telefone", "Serviço", "Data", "Horário", "Forma de Pagamento", "Valor (R$)"]
     )
 
-# Chave Pix
+# Chave Pix configurável
 if "chave_pix" not in st.session_state:
     st.session_state.chave_pix = "Cole sua chave Pix aqui"
 
@@ -76,7 +76,7 @@ with tab2:
         
         st.info(f"💵 **Valor do Serviço:** R$ {preco_atual:.2f}")
         
-        # Exibe a Chave Pix se a opção Pix for selecionada
+        # Exibe a Chave Pix caso o cliente escolha pagar via Pix
         if forma_pagamento_selecionada == "Pix":
             st.warning(f"🔑 **Chave Pix para Pagamento:** `{st.session_state.chave_pix}`")
         
@@ -111,3 +111,47 @@ with tab3:
             if senha_input == SENHA_BARBEIRO:
                 st.session_state.barbeiro_autenticado = True
                 st.success("Acesso liberado!")
+                st.rerun()
+            else:
+                st.error("Senha incorreta!")
+    else:
+        # Cabeçalho da Área Logada
+        col_title, col_logout = st.columns([3, 1])
+        with col_title:
+            st.success("🔓 Modo Barbeiro Ativo")
+        with col_logout:
+            if st.button("🚪 Sair"):
+                st.session_state.barbeiro_autenticado = False
+                st.rerun()
+
+        st.divider()
+
+        # --- 1. GERENCIADOR DA CHAVE PIX ---
+        st.markdown("### 🔑 Alterar Chave Pix")
+        with st.form(key="form_chave_pix"):
+            nova_chave = st.text_input(
+                "Chave Pix Atual (CPF, CNPJ, Celular, E-mail ou Aleatória):",
+                value=st.session_state.chave_pix
+            )
+            btn_salvar_pix = st.form_submit_button("Salvar Chave Pix")
+            
+            if btn_salvar_pix:
+                st.session_state.chave_pix = nova_chave
+                st.success("✅ Chave Pix atualizada com sucesso!")
+                st.rerun()
+
+        st.divider()
+
+        # --- 2. AGENDAMENTOS DO DIA & AÇÕES ---
+        data_hoje = datetime.now().strftime("%d/%m/%Y")
+        st.markdown(f"### 📋 Agendamentos do Dia ({data_hoje})")
+
+        # Botões de Ação (Atualizar / Zerar)
+        col_btn1, col_btn2 = st.columns(2)
+        
+        with col_btn1:
+            if st.button("🔄 Atualizar Lista"):
+                st.rerun()
+                
+        with col_btn2:
+            if st.button("🗑️ Zerar Todos os Agendamentos"):
