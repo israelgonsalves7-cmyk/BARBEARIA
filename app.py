@@ -13,9 +13,7 @@ st.set_page_config(
 st.title("✂️ Barbearia Estilo & Corte")
 st.subheader("Tabela de Serviços e Agendamento Online")
 
-# --- ESTADO DA SESSÃO ---
-
-# Base de dados inicial de preços
+# --- 1. PREÇOS PADRÃO (Para mudar definitivamente, altere os números aqui) ---
 if "servicos_data" not in st.session_state:
     st.session_state.servicos_data = pd.DataFrame({
         "Serviço": ["Corte Masculino", "Barba Completa", "Combo (Corte + Barba)", "Pezinho / Acabamento", "Sobrancelha"],
@@ -23,7 +21,7 @@ if "servicos_data" not in st.session_state:
         "Preço (R$)": [45.00, 35.00, 70.00, 20.00, 15.00]
     })
 
-# Estado para armazenar agendamentos
+# --- 2. HISTÓRICO DE AGENDAMENTOS ---
 if "agendamentos" not in st.session_state:
     st.session_state.agendamentos = pd.DataFrame(
         columns=["Cliente", "Telefone", "Serviço", "Data", "Horário", "Forma de Pagamento", "Valor (R$)"]
@@ -43,7 +41,7 @@ with tab1:
         hide_index=True
     )
 
-# --- ABA 2: FORMULÁRIO DE AGENDAMENTO ---
+# --- ABA 2: AGENDAMENTO ---
 with tab2:
     st.markdown("### Reserve seu Horário")
     
@@ -52,16 +50,14 @@ with tab2:
         telefone = st.text_input("Telefone / WhatsApp")
         servico_selecionado = st.selectbox("Selecione o Serviço", st.session_state.servicos_data["Serviço"])
         
-        # Preço do serviço escolhido
+        # Busca automática do preço atual
         preco_atual = float(st.session_state.servicos_data.loc[
             st.session_state.servicos_data["Serviço"] == servico_selecionado, "Preço (R$)"
         ].values[0])
         
         data_agendamento = st.date_input("Data do Agendamento", min_value=datetime.today())
-        
         horarios = [f"{h:02d}:00" for h in range(9, 19)]
         horario_selecionado = st.selectbox("Horário", horarios)
-        
         forma_pagamento_selecionada = st.selectbox("Forma de Pagamento", formas_pagamento)
         
         st.info(f"💵 **Valor do Serviço:** R$ {preco_atual:.2f}")
@@ -87,7 +83,7 @@ with tab2:
                 )
                 st.success(f"✅ Agendamento confirmado para {nome} em {data_agendamento.strftime('%d/%m/%Y')} às {horario_selecionado}!")
 
-# --- ABA 3: PAINEL DE CONTROLE E ALTERAÇÃO DE PREÇOS ---
+# --- ABA 3: PAINEL & ALTERAÇÃO DE PREÇOS ---
 with tab3:
     st.markdown("### Agendamentos Confirmados")
     
@@ -108,4 +104,32 @@ with tab3:
 
     st.divider()
 
-    # --- SESSÃO PARA
+    # FORMULÁRIO DE ALTERAÇÃO DE PREÇO
+    st.markdown("### ✏️ Alterar Preço de um Serviço")
+    
+    with st.form(key="form_alterar_preco"):
+        servico_alterar = st.selectbox(
+            "Selecione o serviço para alterar o valor:",
+            st.session_state.servicos_data["Serviço"]
+        )
+        
+        preco_atual_selecionado = float(st.session_state.servicos_data.loc[
+            st.session_state.servicos_data["Serviço"] == servico_alterar, "Preço (R$)"
+        ].values[0])
+        
+        novo_preco = st.number_input(
+            "Novo Preço (R$)",
+            min_value=0.0,
+            value=preco_atual_selecionado,
+            step=5.0,
+            format="%.2f"
+        )
+        
+        btn_atualizar_preco = st.form_submit_button("Atualizar Preço")
+        
+        if btn_atualizar_preco:
+            st.session_state.servicos_data.loc[
+                st.session_state.servicos_data["Serviço"] == servico_alterar, "Preço (R$)"
+            ] = novo_preco
+            st.success("Preço atualizado com sucesso!")
+            st.rerun()
