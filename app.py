@@ -77,6 +77,7 @@ with tab2:
         st.info(f"💵 **Valor do Serviço:** R$ {preco_atual:.2f}")
         
         # Exibe a Chave Pix se a opção Pix for selecionada
+        senha = 3120
         if forma_pagamento_selecionada == "Pix":
             st.warning(f"🔑 **Chave Pix para Pagamento:** `{st.session_state.chave_pix}`")
         
