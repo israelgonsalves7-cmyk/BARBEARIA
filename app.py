@@ -13,7 +13,9 @@ st.set_page_config(
 st.title("✂️ Barbearia Estilo & Corte")
 st.subheader("Tabela de Serviços e Agendamento Online")
 
-# --- 1. PREÇOS PADRÃO (Para mudar definitivamente, altere os números aqui) ---
+# --- ESTADO DA SESSÃO ---
+
+# Preços dos serviços
 if "servicos_data" not in st.session_state:
     st.session_state.servicos_data = pd.DataFrame({
         "Serviço": ["Corte Masculino", "Barba Completa", "Combo (Corte + Barba)", "Pezinho / Acabamento", "Sobrancelha"],
@@ -21,11 +23,15 @@ if "servicos_data" not in st.session_state:
         "Preço (R$)": [45.00, 35.00, 70.00, 20.00, 15.00]
     })
 
-# --- 2. HISTÓRICO DE AGENDAMENTOS ---
+# Histórico de agendamentos
 if "agendamentos" not in st.session_state:
     st.session_state.agendamentos = pd.DataFrame(
         columns=["Cliente", "Telefone", "Serviço", "Data", "Horário", "Forma de Pagamento", "Valor (R$)"]
     )
+
+# Chave Pix configurável
+if "chave_pix" not in st.session_state:
+    st.session_state.chave_pix = "123.456.789-00"
 
 formas_pagamento = ["Pix", "Cartão de Crédito", "Cartão de Débito", "Dinheiro (Local)"]
 
@@ -50,7 +56,7 @@ with tab2:
         telefone = st.text_input("Telefone / WhatsApp")
         servico_selecionado = st.selectbox("Selecione o Serviço", st.session_state.servicos_data["Serviço"])
         
-        # Busca automática do preço atual
+        # Busca do preço do serviço escolhido
         preco_atual = float(st.session_state.servicos_data.loc[
             st.session_state.servicos_data["Serviço"] == servico_selecionado, "Preço (R$)"
         ].values[0])
@@ -58,9 +64,14 @@ with tab2:
         data_agendamento = st.date_input("Data do Agendamento", min_value=datetime.today())
         horarios = [f"{h:02d}:00" for h in range(9, 19)]
         horario_selecionado = st.selectbox("Horário", horarios)
+        
         forma_pagamento_selecionada = st.selectbox("Forma de Pagamento", formas_pagamento)
         
         st.info(f"💵 **Valor do Serviço:** R$ {preco_atual:.2f}")
+        
+        # Exibe a Chave Pix caso o cliente selecione pagamento via Pix
+        if forma_pagamento_selecionada == "Pix":
+            st.warning(f"🔑 **Chave Pix para Pagamento:** `{st.session_state.chave_pix}`")
         
         btn_confirmar = st.form_submit_button("Confirmar Agendamento")
         
@@ -81,9 +92,10 @@ with tab2:
                     [st.session_state.agendamentos, pd.DataFrame([novo_registro])],
                     ignore_index=True
                 )
-                st.success(f"✅ Agendamento confirmado para {nome} em {data_agendamento.strftime('%d/%m/%Y')} às {horario_selecionado}!")
+                msg_sucesso = f"✅ Agendamento confirmado para {nome} em {data_agendamento.strftime('%d/%m/%Y')} às {horario_selecionado}!"
+                st.success(msg_sucesso)
 
-# --- ABA 3: PAINEL & ALTERAÇÃO DE PREÇOS ---
+# --- ABA 3: PAINEL DE CONTROLE & CONFIGURAÇÕES ---
 with tab3:
     st.markdown("### Agendamentos Confirmados")
     
@@ -104,8 +116,22 @@ with tab3:
 
     st.divider()
 
-    # FORMULÁRIO DE ALTERAÇÃO DE PREÇO
-    st.markdown("### ✏️ Alterar Preço de um Serviço")
+    # --- CONFIGURAÇÃO DA CHAVE PIX ---
+    st.markdown("### 🔑 Configurar Chave Pix")
+    
+    with st.form(key="form_chave_pix"):
+        nova_chave = st.text_input("Chave Pix (CPF, CNPJ, Telefone ou E-mail)", value=st.session_state.chave_pix)
+        btn_pix = st.form_submit_button("Salvar Chave Pix")
+        
+        if btn_pix:
+            st.session_state.chave_pix = nova_chave
+            st.success("Chave Pix atualizada com sucesso!")
+            st.rerun()
+
+    st.divider()
+
+    # --- ALTERAÇÃO DE PREÇOS ---
+    st.markdown("### ✏️ Alterar Preço dos Serviços")
     
     with st.form(key="form_alterar_preco"):
         servico_alterar = st.selectbox(
@@ -131,5 +157,5 @@ with tab3:
             st.session_state.servicos_data.loc[
                 st.session_state.servicos_data["Serviço"] == servico_alterar, "Preço (R$)"
             ] = novo_preco
-            st.success("Preço atualizado com sucesso!")
+            st.success(f"O preço do serviço {servico_alterar} foi alterado para R$ {novo_preco:.2f}!")
             st.rerun()
