@@ -14,7 +14,7 @@ st.title("✂️ Barbearia Estilo & Corte")
 st.subheader("Tabela de Serviços e Agendamento Online")
 
 # --- SENHA DE ACESSO DO BARBEIRO ---
-SENHA_BARBEIRO = "1234"  # 👈 Mude aqui para a senha que você desejar!
+SENHA_BARBEIRO = "1234"  # 👈 Mude para a senha que desejar!
 
 # --- ESTADO DA SESSÃO (Memória do App) ---
 
@@ -90,24 +90,4 @@ with tab2:
                     "Cliente": nome,
                     "Telefone": telefone,
                     "Serviço": servico_selecionado,
-                    "Data": data_agendamento.strftime("%d/%m/%Y"),
-                    "Horário": horario_selecionado,
-                    "Forma de Pagamento": forma_pagamento_selecionada,
-                    "Valor (R$)": preco_atual
-                }
-                st.session_state.agendamentos = pd.concat(
-                    [st.session_state.agendamentos, pd.DataFrame([novo_registro])],
-                    ignore_index=True
-                )
-                st.success(f"✅ Agendamento confirmado para {nome} em {data_agendamento.strftime('%d/%m/%Y')} às {horario_selecionado}!")
-
-# --- ABA 3: ÁREA EXCLUSIVA DO BARBEIRO (RESTRITA POR SENHA) ---
-with tab3:
-    if not st.session_state.barbeiro_autenticado:
-        st.markdown("### 🔐 Acesso Restrito ao Barbeiro")
-        senha_digitada = st.text_input("Digite a senha de acesso:", type="password")
-        if st.button("Entrar"):
-            if senha_digitada == SENHA_BARBEIRO:
-                st.session_state.barbeiro_autenticado = True
-                st.success("Acesso liberado!")
-                st.
+                    "Data": data_agend
