@@ -14,7 +14,7 @@ st.title("✂️ Barbearia Estilo & Corte")
 st.subheader("Tabela de Serviços e Agendamento Online")
 
 # --- SENHA DE ACESSO DO BARBEIRO ---
-SENHA_BARBEIRO = "1234"  # 👈 Mude para a senha que desejar!
+SENHA_BARBEIRO = "1234"  # 👈 Altere para a senha que desejar!
 
 # --- ESTADO DA SESSÃO (Memória do App) ---
 
@@ -77,7 +77,6 @@ with tab2:
         st.info(f"💵 **Valor do Serviço:** R$ {preco_atual:.2f}")
         
         # Exibe a Chave Pix se a opção Pix for selecionada
-        senha = 3120
         if forma_pagamento_selecionada == "Pix":
             st.warning(f"🔑 **Chave Pix para Pagamento:** `{st.session_state.chave_pix}`")
         
@@ -91,4 +90,24 @@ with tab2:
                     "Cliente": nome,
                     "Telefone": telefone,
                     "Serviço": servico_selecionado,
-                    "Data": data_agend
+                    "Data": data_agendamento.strftime("%d/%m/%Y"),
+                    "Horário": horario_selecionado,
+                    "Forma de Pagamento": forma_pagamento_selecionada,
+                    "Valor (R$)": preco_atual
+                }
+                st.session_state.agendamentos = pd.concat(
+                    [st.session_state.agendamentos, pd.DataFrame([novo_registro])],
+                    ignore_index=True
+                )
+                st.success(f"✅ Agendamento confirmado para {nome} em {data_agendamento.strftime('%d/%m/%Y')} às {horario_selecionado}!")
+
+# --- ABA 3: ÁREA EXCLUSIVA DO BARBEIRO (RESTRITA POR SENHA) ---
+with tab3:
+    if not st.session_state.barbeiro_autenticado:
+        st.markdown("### 🔐 Acesso Restrito ao Barbeiro")
+        senha_input = st.text_input("Digite a senha de acesso:", type="password", key="input_senha_barbeiro")
+        
+        if st.button("Entrar no Painel"):
+            if senha_input == SENHA_BARBEIRO:
+                st.session_state.barbeiro_autenticado = True
+                st.success("Acesso liberado!")
