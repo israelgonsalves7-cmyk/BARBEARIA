@@ -14,7 +14,7 @@ st.title("✂️ Barbearia Estilo & Corte")
 st.subheader("Tabela de Serviços e Agendamento Online")
 
 # --- SENHA DE ACESSO DO BARBEIRO ---
-SENHA_BARBEIRO = "1234"  # 👈 Altere para a senha que desejar!
+SENHA_BARBEIRO = "1234"  # 👈 Mude para a senha que desejar!
 
 # --- ESTADO DA SESSÃO (Memória do App) ---
 
@@ -32,7 +32,7 @@ if "agendamentos" not in st.session_state:
         columns=["Cliente", "Telefone", "Serviço", "Data", "Horário", "Forma de Pagamento", "Valor (R$)"]
     )
 
-# Chave Pix configurável (Apenas o Barbeiro altera)
+# Chave Pix configurável (Edição restrita ao barbeiro)
 if "chave_pix" not in st.session_state:
     st.session_state.chave_pix = "Cole sua chave Pix aqui"
 
@@ -78,17 +78,4 @@ with tab2:
         
         # Exibe a Chave Pix caso o cliente escolha pagar via Pix
         if forma_pagamento_selecionada == "Pix":
-            st.warning(f"🔑 **Chave Pix para Pagamento:** `{st.session_state.chave_pix}`")
-        
-        btn_confirmar = st.form_submit_button("Confirmar Agendamento")
-        
-        if btn_confirmar:
-            if not nome or not telefone:
-                st.error("Por favor, preencha seu nome e telefone.")
-            else:
-                novo_registro = {
-                    "Cliente": nome,
-                    "Telefone": telefone,
-                    "Serviço": servico_selecionado,
-                    "Data": data_agendamento.strftime("%d/%m/%Y"),
-                    "Horário": horario_selecionado,
+            st.warning(f"🔑 **Chave Pix para Pag
