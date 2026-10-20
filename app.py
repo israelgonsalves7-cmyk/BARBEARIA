@@ -32,7 +32,7 @@ if "agendamentos" not in st.session_state:
         columns=["Cliente", "Telefone", "Serviço", "Data", "Horário", "Forma de Pagamento", "Valor (R$)"]
     )
 
-# Chave Pix configurável (Edição restrita ao barbeiro)
+# Chave Pix configurável
 if "chave_pix" not in st.session_state:
     st.session_state.chave_pix = "Cole sua chave Pix aqui"
 
@@ -64,18 +64,4 @@ with tab2:
         servico_selecionado = st.selectbox("Selecione o Serviço", st.session_state.servicos_data["Serviço"])
         
         # Preço do serviço escolhido
-        preco_atual = float(st.session_state.servicos_data.loc[
-            st.session_state.servicos_data["Serviço"] == servico_selecionado, "Preço (R$)"
-        ].values[0])
-        
-        data_agendamento = st.date_input("Data do Agendamento", min_value=datetime.today())
-        horarios = [f"{h:02d}:00" for h in range(9, 19)]
-        horario_selecionado = st.selectbox("Horário", horarios)
-        
-        forma_pagamento_selecionada = st.selectbox("Forma de Pagamento", formas_pagamento)
-        
-        st.info(f"💵 **Valor do Serviço:** R$ {preco_atual:.2f}")
-        
-        # Exibe a Chave Pix caso o cliente escolha pagar via Pix
-        if forma_pagamento_selecionada == "Pix":
-            st.warning(f"🔑 **Chave Pix para Pag
+        preco_atual = float
